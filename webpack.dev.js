@@ -34,7 +34,7 @@ module.exports = {
     noInfo: false,
     stats: 'minimal',
     publicPath: publicPath,
-    contentBase: './examples'
+    contentBase: ['./examples', './src']
   },
 
   plugins: [
