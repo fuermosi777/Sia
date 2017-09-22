@@ -1,5 +1,5 @@
 import React from 'react';
-import {Editor, EditorState, RichUtils, CompositeDecorator} from 'draft-js';
+import {Editor, EditorState, RichUtils, CompositeDecorator, Modifier} from 'draft-js';
 
 const BOLD_REGEX = /\*\*([\w]+)\*\*/g;
 
@@ -18,17 +18,30 @@ function boldStrategy(contentBlock, callback, contentState) {
 }
 
 const boldSpan = props => {
+  let editorState = props.parent.state.editorState;
+  // let newState = Modifier.replaceText(
+  //   editorState.getCurrentContent(),
+  //   selectionState,
+  //   "my new text",
+  //   null,
+  //   entityKey,
+  // );
+
   return <span className="Sia-bold">{props.children}</span>;
 };
 
-const compositeDecorator = new CompositeDecorator([{
-  strategy: boldStrategy,
-  component: boldSpan
-}]);
+
 
 class Sia extends React.Component {
   constructor(props) {
     super(props);
+
+    const compositeDecorator = new CompositeDecorator([{
+      strategy: boldStrategy,
+      component: boldSpan,
+      props: {parent: this}
+    }]);
+
     this.state = {editorState: EditorState.createEmpty(compositeDecorator)};
 
   }
@@ -38,7 +51,8 @@ class Sia extends React.Component {
         <Editor
           editorState={this.state.editorState}
           onChange={this.onChange.bind(this)}
-          handleKeyCommand={this.handleKeyCommand.bind(this)}/>
+          handleKeyCommand={this.handleKeyCommand.bind(this)}
+        />
       </div>
     );
   }
