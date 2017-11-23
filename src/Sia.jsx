@@ -1,6 +1,17 @@
 import React from 'react';
-import {Editor, EditorState, RichUtils, CompositeDecorator, Modifier, SelectionState, ContentState} from 'draft-js';
-import { checkCharacterForState } from './utils';
+import {
+  Editor,
+  EditorState,
+  RichUtils,
+  CompositeDecorator,
+  Modifier,
+  SelectionState,
+  ContentState
+} from 'draft-js';
+import { 
+  checkCharacterForState,
+  checkReturnForState
+} from './utils';
 
 class Sia extends React.Component {
   constructor(props) {
@@ -19,6 +30,7 @@ class Sia extends React.Component {
           handleKeyCommand={this.handleKeyCommand.bind(this)}
           handleBeforeInput={this.handleBeforeInput.bind(this)}
           onFocus={this.handleFocus.bind(this)}
+          handleReturn={this.handleReturn.bind(this)}
         />
       </div>
     );
@@ -46,6 +58,16 @@ class Sia extends React.Component {
 
     const newEditorState = checkCharacterForState(editorState, character);
 
+    if (editorState !== newEditorState) {
+      this.setState({editorState: newEditorState});
+      return "handled";
+    }
+
+    return "not-handled";
+  }
+
+  handleReturn(e, editorState) {
+    let newEditorState = checkReturnForState(editorState, e);
     if (editorState !== newEditorState) {
       this.setState({editorState: newEditorState});
       return "handled";
