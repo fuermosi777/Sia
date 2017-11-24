@@ -13,12 +13,19 @@ import {
   checkReturnForState,
   styleMap
 } from './utils';
+import createImageDecorator from './decorators/imageDecorator';
+import createLinkDecorator from './decorators/linkDecorator';
 
 class Sia extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {editorState: EditorState.createWithContent(ContentState.createFromText(`123\n**123**`))};
+    const compositeDecorator = new CompositeDecorator([createImageDecorator(), createLinkDecorator()]);
+
+    this.state = {editorState: EditorState.createWithContent(
+      ContentState.createFromText(`123\n**123**`),
+      compositeDecorator
+    )};
   }
   render() {
     return (

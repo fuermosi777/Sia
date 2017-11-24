@@ -5,6 +5,8 @@ import handleInsertText from './handlers/handleInsertText';
 import handleNewCodeBlock from './handlers/handleNewCodeBlock';
 import handleInlineStyle from './handlers/handleInlineStyle';
 import handleSplitBlock from './handlers/handleSplitBlock';
+import handleImage from './handlers/handleImage';
+import handleLink from './handlers/handleLink';
 import {
   EditorState,
   SelectionState,
@@ -14,12 +16,12 @@ import { CODE_BLOCK_START, CODE_BLOCK_END } from './regex';
 
 export function checkCharacterForState(editorState, character) {
   let newEditorState = handleBlockType(editorState, character);
-  // if (editorState === newEditorState) {
-  //   newEditorState = handleImage(editorState, character);
-  // }
-  // if (editorState === newEditorState) {
-  //   newEditorState = handleLink(editorState, character);
-  // }
+  if (editorState === newEditorState) {
+    newEditorState = handleImage(editorState, character);
+  }
+  if (editorState === newEditorState) {
+    newEditorState = handleLink(editorState, character);
+  }
   if (editorState === newEditorState) {
     newEditorState = handleInlineStyle(editorState, character);
   }
