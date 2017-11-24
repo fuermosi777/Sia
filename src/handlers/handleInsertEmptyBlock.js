@@ -42,5 +42,5 @@ export default function handleInsertEmptyBlock(editorState, blockType = 'unstyle
       isBackward: false,
     }),
   });
-  return EditorState.push(editorState, newContentState, "split-block");
+  return EditorState.push(editorState, newContentState, 'split-block');
 };

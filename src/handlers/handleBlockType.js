@@ -1,7 +1,7 @@
-import { changeCurrentBlockType } from '../utils';
+import { changeCurrentBlockType, getCurrent } from '../utils';
 import { RichUtils } from "draft-js";
 
-const headerSymbols = [ '#', '##', '###', '####', '#####', '######' ];
+const headerSymbols = [ '# ', '## ', '### ', '#### ', '##### ', '###### ' ];
 
 const headerTypes = [
   'header-one',
@@ -13,25 +13,21 @@ const headerTypes = [
 ];
 
 export default function handleBlockType(editorState, character) {
-  const currentSelection = editorState.getSelection();
-  const key = currentSelection.getStartKey();
-  const currentBlock = editorState.getCurrentContent().getBlockForKey(key);
-  const currentText = currentBlock.getText();
-  const currentBlockType = currentBlock.getType();
+  const { text, type, selection } = getCurrent(editorState);
 
-  const position = currentSelection.getAnchorOffset();
-  const line = [currentText.slice(0, position), character, currentText.slice(position)].join('');
-  const blockType = RichUtils.getCurrentBlockType(editorState);
+  const position = selection.getAnchorOffset();
+  const line = [text.slice(0, position), character, text.slice(position)].join('');
 
   // Check headers, and only check when current is not header
-  if (headerTypes.indexOf(currentBlockType) === -1) {
-    for (let i = 0; i < 6; i++)
-    if (line.indexOf(headerSymbols[i]) === 0) {
-      return changeCurrentBlockType(
-        editorState,
-        headerTypes[i],
-        line.replace(/^#+\s/, '')
-      );
+  if (headerTypes.indexOf(type) === -1) {
+    for (let i = 0; i < 6; i++) {
+      if (line.indexOf(headerSymbols[i]) === 0) {
+        return changeCurrentBlockType(
+          editorState,
+          headerTypes[i],
+          line.replace(/^#+\s/, '')
+        );
+      }
     }
   }
   

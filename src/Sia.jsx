@@ -10,7 +10,8 @@ import {
 } from 'draft-js';
 import { 
   checkCharacterForState,
-  checkReturnForState
+  checkReturnForState,
+  styleMap
 } from './utils';
 
 class Sia extends React.Component {
@@ -31,6 +32,7 @@ class Sia extends React.Component {
           handleBeforeInput={this.handleBeforeInput.bind(this)}
           onFocus={this.handleFocus.bind(this)}
           handleReturn={this.handleReturn.bind(this)}
+          customStyleMap={styleMap}
         />
       </div>
     );
