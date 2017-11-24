@@ -1,7 +1,4 @@
-.Sia .Sia-bold {
-  font-weight: bold;
-}
-
-.Sia .Sia-heading {
-  font-size: 20px;
+.Sia pre {
+  border: 1px solid #efefef;
+  padding: 5px;
 }

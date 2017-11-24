@@ -205,6 +205,9 @@ export function removeCurrentInlineStyles(editorState) {
 }
 
 export const styleMap = {
+  HEADER_MARKER: {
+    color: 'lightgray'
+  },
   INLINE_MARKER: {
     color: 'red'
   }
