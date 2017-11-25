@@ -1,0 +1,1 @@
+handlers will eventually push a new state to editorState.

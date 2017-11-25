@@ -2,8 +2,9 @@ import { getCurrent, changeCurrentInlineStyle } from '../utils';
 import { BOLD, ITALIC, CODE, STRIKETHROUGH } from '../regex';
 
 export default function handleInlineStyle(editorState, character) {
-  const { text } = getCurrent(editorState);
-  const line = `${text}${character}`;
+  const { text, selection } = getCurrent(editorState);
+  const position = selection.getAnchorOffset();
+  const line = [text.slice(0, position), character, text.slice(position)].join('');
 
   let newEditorState = editorState;
 

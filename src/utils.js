@@ -56,7 +56,7 @@ function isHeader(type) {
   return /^header-/.test(type);
 }
 
-function hasInlineStyle(editorState) {
+export function hasInlineStyle(editorState) {
   return editorState.getCurrentInlineStyle().size > 0;
 }
 
@@ -72,13 +72,9 @@ export function checkReturnForState(editorState, event) {
   }
 
   // For headers or blockquote, start a new line
+  // No matter if it's last or not
   if (isHeader(type)) {
-    if (isLast) {
-      newEditorState = handleInsertEmptyBlock(newEditorState);
-    } else {
-      newEditorState = handleSplitBlock(newEditorState);
-      newEditorState = handleExitBlock(newEditorState);
-    }
+    newEditorState = handleInsertEmptyBlock(newEditorState);
   }
 
   // For ```, start a new code block
@@ -107,9 +103,13 @@ export function checkReturnForState(editorState, event) {
     }
   }
 
-  // When user type enter at the end of each line, remove all inline styles
-  if (hasInlineStyle(newEditorState)) {
-    newEditorState = removeCurrentInlineStyles(newEditorState);
+  if (type === 'unstyled' && hasInlineStyle(newEditorState)) {
+    if (isLast) {
+      newEditorState = handleInsertEmptyBlock(newEditorState)
+    } else {
+      newEditorState = handleSplitBlock(newEditorState);
+      newEditorState = removeCurrentInlineStyles(newEditorState); 
+    }
   }
 
   return newEditorState;
@@ -140,23 +140,35 @@ export function changeCurrentBlockType(
 };
 
 export function changeCurrentInlineStyle(editorState, matchArr, style, character) {
+  // Since JS doesn't have zero-width negative lookbehind,
+  // need to check match array manually
+  const isRegexZeroWidth = matchArr[0] === matchArr[1];
+  const index = isRegexZeroWidth ? matchArr.index : matchArr.index + 1;
+
   const currentContent = editorState.getCurrentContent();
   const selection = editorState.getSelection();
   const key = selection.getStartKey();
-  const { index } = matchArr;
   const blockMap = currentContent.getBlockMap();
   const block = blockMap.get(key);
   const currentInlineStyle = block.getInlineStyleAt(index).merge();
-  const newStyle = currentInlineStyle.merge([style]);
-  const focusOffset = index + matchArr[0].length;
+
+  let newStyle;
+  if (currentInlineStyle.has('CODE')) {
+    return editorState;
+  } else {
+    newStyle = currentInlineStyle.merge([style]);
+  }
+
+  const focusOffset = index + matchArr[1].length;
   const wordSelection = SelectionState.createEmpty(key).merge({
     anchorOffset: index,
     focusOffset,
   });
+  
   let newContentState = Modifier.replaceText(
     currentContent,
     wordSelection,
-    matchArr[1],
+    matchArr[2],
     newStyle
   );
   newContentState = Modifier.insertText(
@@ -164,11 +176,12 @@ export function changeCurrentInlineStyle(editorState, matchArr, style, character
     newContentState.getSelectionAfter(),
     ' '
   );
-  const newEditorState = EditorState.push(
+  let newEditorState = EditorState.push(
     editorState,
     newContentState,
     'change-inline-style'
   );
+  
   return EditorState.forceSelection(
     newEditorState,
     newContentState.getSelectionAfter()
