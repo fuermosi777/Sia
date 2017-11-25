@@ -2,8 +2,7 @@ import { EditorState, Modifier } from "draft-js";
 import { getCurrent } from '../utils';
 
 export default function handleInsertText(editorState, text) {
-  const selection = editorState.getSelection();
-  const { content } = getCurrent(editorState);
+  const { content, selection } = getCurrent(editorState);
 
   const newContentState = Modifier.insertText(
     content,

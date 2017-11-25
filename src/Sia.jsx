@@ -14,6 +14,7 @@ import {
   getCurrent,
   styleMap
 } from './utils';
+import handleInsertText from './handlers/handleInsertText';
 import createImageDecorator from './decorators/imageDecorator';
 import createLinkDecorator from './decorators/linkDecorator';
 
@@ -37,30 +38,77 @@ class Sia extends React.Component {
         <Editor
           ref={editor => this.editor = editor}
           editorState={this.state.editorState}
-          onChange={this.onChange.bind(this)}
+          onChange={this.handleChange.bind(this)}
           blockRendererFn={this.blockRendererFn.bind(this)}
           handleKeyCommand={this.handleKeyCommand.bind(this)}
           handleBeforeInput={this.handleBeforeInput.bind(this)}
           onFocus={this.handleFocus.bind(this)}
           handleReturn={this.handleReturn.bind(this)}
           customStyleMap={styleMap}
+          onTab={this.handleTab.bind(this)}
+          stripPastedStyles={true}
+          handlePastedText={this.handlePastedText.bind(this)}
         />
       </div>
     );
   }
-  onChange(editorState) {
+  handleChange(editorState) {
     const { content } = getCurrent(editorState);
     
     this.setState({editorState});
   }
+  handleTab(ev) {
+    const newEditorState = handleInsertText(this.state.editorState, '\t')
+    this.handleChange(newEditorState);
+    ev.preventDefault();
+  }
   handleKeyCommand(command, editorState) {
-    // console.log('key', command);
+    console.log('key', command);
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
-      this.onChange.call(this, newState);
+      this.handleChange(newState);
       return 'handled';
     }
     return 'not-handled';
+  }
+
+  handlePastedText(text, html, editorState) {
+    let newEditorState = editorState;
+    let buffer = [];
+    
+    for (let i = 0; i < text.length; i++) {
+      if (INLINE_STYLE_CHARACTERS.indexOf(text[i]) >= 0) {
+        newEditorState = replaceText(
+          newEditorState,
+          buffer.join("") + text[i]
+        );
+        newEditorState = checkCharacterForState(newEditorState, text[i]);
+        buffer = [];
+      } else if (text[i].charCodeAt(0) === 10) {
+        newEditorState = replaceText(newEditorState, buffer.join(""));
+        const tmpEditorState = checkReturnForState(newEditorState, {});
+        if (newEditorState === tmpEditorState) {
+          newEditorState = insertEmptyBlock(tmpEditorState);
+        } else {
+          newEditorState = tmpEditorState;
+        }
+        buffer = [];
+      } else if (i === text.length - 1) {
+        newEditorState = replaceText(
+          newEditorState,
+          buffer.join("") + text[i]
+        );
+        buffer = [];
+      } else {
+        buffer.push(text[i]);
+      }
+    }
+
+    if (editorState !== newEditorState) {
+      setEditorState(newEditorState);
+      return "handled";
+    }
+    return "not-handled";
   }
 
   handleBeforeInput(character, editorState) {

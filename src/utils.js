@@ -17,7 +17,15 @@ import { CODE_BLOCK_START, CODE_BLOCK_END } from './regex';
 import { OrderedSet } from 'immutable';
 
 export function checkCharacterForState(editorState, character) {
+  let { type } = getCurrent(editorState);
+
+  // If in code block, don't add any markdown
+  if (isCodeBlock(type)) {
+    return editorState;
+  }
+
   let newEditorState = handleBlockType(editorState, character);
+  
   if (editorState === newEditorState) {
     newEditorState = handleImage(editorState, character);
   }
@@ -35,8 +43,8 @@ export function getCurrent(editorState) {
   const selection = editorState.getSelection();
   const key = selection.getStartKey();
   const block = content.getBlockForKey(key);
-  const type = block.getType();
-  const text = block.getText();
+  const type = block ? block.getType() : null;
+  const text = block ? block.getText() : null;
 
   return {
     content, selection, key, block, type, text
@@ -54,6 +62,10 @@ export function isList(type) {
 
 function isHeader(type) {
   return /^header-/.test(type);
+}
+
+function isCodeBlock(type) {
+  return type === 'code-block';
 }
 
 export function hasInlineStyle(editorState) {
@@ -79,7 +91,7 @@ export function checkReturnForState(editorState, event) {
 
   // For ```, start a new code block
   if (newEditorState === editorState &&
-    type !== 'code-block' &&
+    !isCodeBlock(type) &&
     CODE_BLOCK_START.test(text)
   ) {
     newEditorState = handleNewCodeBlock(editorState);
@@ -87,7 +99,7 @@ export function checkReturnForState(editorState, event) {
 
   // For ```, end code block
   if (newEditorState === editorState &&
-    type === 'code-block'
+    isCodeBlock(type)
   ) {
     if (CODE_BLOCK_END.test(text)) {
       // remove last ```
@@ -109,6 +121,11 @@ export function checkReturnForState(editorState, event) {
     } else {
       newEditorState = handleSplitBlock(newEditorState);
       newEditorState = removeCurrentInlineStyles(newEditorState); 
+      
+      // Remove inline in undoStack
+      let undoStack = newEditorState.getUndoStack();
+      undoStack = undoStack.pop();
+      newEditorState = EditorState.set(newEditorState, { undoStack });
     }
   }
 
