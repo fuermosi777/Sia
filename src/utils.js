@@ -10,9 +10,11 @@ import handleLink from './handlers/handleLink';
 import {
   EditorState,
   SelectionState,
-  Modifier
+  Modifier,
+  RichUtils
 } from 'draft-js';
 import { CODE_BLOCK_START, CODE_BLOCK_END } from './regex';
+import { OrderedSet } from 'immutable';
 
 export function checkCharacterForState(editorState, character) {
   let newEditorState = handleBlockType(editorState, character);
@@ -41,25 +43,40 @@ export function getCurrent(editorState) {
   };
 }
 
+/**
+ * Check if current block type is list
+ * @param {*} type
+ * @return {boolean}
+ */
+export function isList(type) {
+  return type === 'unordered-list-item' || type === 'ordered-list-item';
+}
+
+function isHeader(type) {
+  return /^header-/.test(type);
+}
+
+function hasInlineStyle(editorState) {
+  return editorState.getCurrentInlineStyle().size > 0;
+}
+
 export function checkReturnForState(editorState, event) {
   let newEditorState = editorState;
   let { type, text, selection } = getCurrent(editorState);
 
   const isLast = selection.getEndOffset() === text.length;
-  let isSplit = false;
   
   // For empty list item return, exit the list
-  if ((type === 'unordered-list-item' || type === 'ordered-list-item') && text === '') {
+  if (isList(type) && text === '') {
     newEditorState = handleExitBlock(editorState);
   }
 
   // For headers or blockquote, start a new line
-  if (/^header-/.test(type)) {
+  if (isHeader(type)) {
     if (isLast) {
       newEditorState = handleInsertEmptyBlock(newEditorState);
     } else {
       newEditorState = handleSplitBlock(newEditorState);
-      isSplit = true;
       newEditorState = handleExitBlock(newEditorState);
     }
   }
@@ -91,10 +108,7 @@ export function checkReturnForState(editorState, event) {
   }
 
   // When user type enter at the end of each line, remove all inline styles
-  if (newEditorState.getCurrentInlineStyle().size > 0) {
-    if (!isSplit) {
-      newEditorState = handleSplitBlock(newEditorState);
-    }
+  if (hasInlineStyle(newEditorState)) {
     newEditorState = removeCurrentInlineStyles(newEditorState);
   }
 
@@ -148,7 +162,7 @@ export function changeCurrentInlineStyle(editorState, matchArr, style, character
   newContentState = Modifier.insertText(
     newContentState,
     newContentState.getSelectionAfter(),
-    character || ' '
+    ' '
   );
   const newEditorState = EditorState.push(
     editorState,
@@ -167,20 +181,29 @@ export function removeCurrentInlineStyles(editorState) {
   let newContentState = content;
   let styles = ['BOLD', 'ITALIC', 'CODE', 'UNDERLINE', 'STRIKETHROUGH'];
 
-  let wordSelection = SelectionState.createEmpty(key).merge({
+  const entireBlockSelection = selection.merge({
+    anchorKey: key,
     anchorOffset: 0,
+    focusKey: key,
     focusOffset: text.length
   });
+
+  if (entireBlockSelection.isCollapsed()) {
+    return EditorState.setInlineStyleOverride(
+      editorState,
+      new OrderedSet()
+    );
+  }
 
   newContentState = styles.reduce((contentState, style) => {
     return Modifier.removeInlineStyle(
       contentState,
-      wordSelection,
+      entireBlockSelection,
       style
     )
   }, newContentState);
 
-  const newEditorState = EditorState.push(
+  let newEditorState = EditorState.push(
     editorState,
     newContentState,
     'change-inline-style'
@@ -202,6 +225,15 @@ export function removeCurrentInlineStyles(editorState) {
     afterRemoved,
     afterRemoved.getSelection()
   );
+}
+
+export function findWithRegex(regex, contentBlock, callback) {
+  const text = contentBlock.getText();
+  let matchArr, start;
+  while ((matchArr = regex.exec(text)) !== null) {
+    start = matchArr.index;
+    callback(start, start + matchArr[0].length);
+  }
 }
 
 export const styleMap = {

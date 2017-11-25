@@ -8,7 +8,6 @@ export default function handleInsertEmptyBlock(editorState, blockType = 'unstyle
   const currentBlock = contentState.getBlockForKey(key);
   const emptyBlockKey = genKey();
   const emptyBlock = new ContentBlock({
-    characterList: List(),
     depth: 0,
     key: emptyBlockKey,
     text: '',
@@ -42,5 +41,6 @@ export default function handleInsertEmptyBlock(editorState, blockType = 'unstyle
       isBackward: false,
     }),
   });
+  
   return EditorState.push(editorState, newContentState, 'split-block');
 };

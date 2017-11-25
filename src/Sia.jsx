@@ -11,6 +11,7 @@ import {
 import { 
   checkCharacterForState,
   checkReturnForState,
+  getCurrent,
   styleMap
 } from './utils';
 import createImageDecorator from './decorators/imageDecorator';
@@ -20,7 +21,10 @@ class Sia extends React.Component {
   constructor(props) {
     super(props);
 
-    const compositeDecorator = new CompositeDecorator([createImageDecorator(), createLinkDecorator()]);
+    const compositeDecorator = new CompositeDecorator([
+      createImageDecorator(),
+      createLinkDecorator()
+    ]);
 
     this.state = {editorState: EditorState.createWithContent(
       ContentState.createFromText(`123\n**123**`),
@@ -45,8 +49,8 @@ class Sia extends React.Component {
     );
   }
   onChange(editorState) {
-    const contentState = editorState.getCurrentContent();
-    // console.log('change', contentState);
+    const { content } = getCurrent(editorState);
+    
     this.setState({editorState});
   }
   handleKeyCommand(command, editorState) {
@@ -61,9 +65,9 @@ class Sia extends React.Component {
 
   handleBeforeInput(character, editorState) {
     // Start to handle stuff only when user types space
-    if (character !== ' ') {
-      return "not-handled";
-    }
+    // if (character !== ' ') {
+    //   return "not-handled";
+    // }
 
     const newEditorState = checkCharacterForState(editorState, character);
 
