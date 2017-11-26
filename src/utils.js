@@ -123,19 +123,26 @@ export function checkReturnForState(editorState, event) {
       newEditorState = removeCurrentInlineStyles(newEditorState); 
       
       // Remove inline in undoStack
-      newEditorState = resetUndoStack(newEditorState);
+      newEditorState = forgetUndo(newEditorState);
     }
   }
 
   return newEditorState;
 }
 
-export function resetUndoStack(editorState, count = 1) {
+export function forgetUndo(editorState, times = 1, keepEarliest = false) {
   let undoStack = editorState.getUndoStack();
   let i = 0;
-  while (i < count) {
+  let latestState;
+  if (keepEarliest) {
+    latestState = undoStack.last();
+  }
+  while (i < times && undoStack.size > 0) {
     undoStack = undoStack.pop();
     i++;
+  }
+  if (keepEarliest) {
+    undoStack = undoStack.push(latestState);
   }
   return EditorState.set(editorState, { undoStack });
 }

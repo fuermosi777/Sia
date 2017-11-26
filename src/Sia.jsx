@@ -6,7 +6,9 @@ import {
   CompositeDecorator,
   Modifier,
   SelectionState,
-  ContentState
+  ContentState,
+  convertToRaw,
+  convertFromRaw,
 } from 'draft-js';
 import { 
   checkCharacterForState,
@@ -15,13 +17,26 @@ import {
   replaceText,
   styleMap
 } from './utils';
+import PropTypes from 'prop-types';
 import handleInsertText from './handlers/handleInsertText';
 import handleInsertEmptyBlock from './handlers/handleInsertEmptyBlock';
+import handleLoadText from './handlers/handleLoadText';
 
 import createImageDecorator from './decorators/imageDecorator';
 import createLinkDecorator from './decorators/linkDecorator';
 
 class Sia extends React.Component {
+
+  static propTypes = {
+    raw: PropTypes.object,
+    text: PropTypes.string,
+  };
+
+  static defaultPropTypes = {
+    raw: null,
+    text: ''
+  };
+
   constructor(props) {
     super(props);
 
@@ -30,11 +45,31 @@ class Sia extends React.Component {
       createLinkDecorator()
     ]);
 
-    this.state = {editorState: EditorState.createWithContent(
-      ContentState.createFromText(`123\n**123**`),
-      compositeDecorator
-    )};
+    let editorState;
+
+    if (props.raw) {
+      editorState = EditorState.createWithContent(
+        convertFromRaw(props.raw),
+        compositeDecorator
+      )
+    } else {
+      editorState = EditorState.createEmpty(compositeDecorator);
+    }
+
+    this.state = {editorState};
   }
+
+  componentDidMount() {
+    if (this.props.text) {
+      let newEditorState = handleLoadText(this.state.editorState, this.props.text);
+
+      if (newEditorState !== this.state.editorState) {
+        this.handleChange.call(this, newEditorState);
+      }
+    }
+  }
+
+
   render() {
     return (
       <div className="Sia">
@@ -76,37 +111,7 @@ class Sia extends React.Component {
   }
 
   handlePastedText(text, html, editorState) {
-    let newEditorState = editorState;
-    let buffer = [];
-
-    for (let i = 0; i < text.length; i++) {
-      if ([' ', '*', '_', '`'].indexOf(text[i]) >= 0) {
-        newEditorState = replaceText(
-          newEditorState,
-          buffer.join('') + text[i]
-        );
-        newEditorState = checkCharacterForState(newEditorState, '');
-        buffer = [];
-      } else if (text[i].charCodeAt(0) === 10) {
-        // return
-        newEditorState = replaceText(newEditorState, buffer.join(''));
-        const tmpEditorState = checkReturnForState(newEditorState, {});
-        if (newEditorState === tmpEditorState) {
-          newEditorState = handleInsertEmptyBlock(tmpEditorState);
-        } else {
-          newEditorState = tmpEditorState;
-        }
-        buffer = [];
-      // } else if (i === text.length - 1) {
-      //   newEditorState = replaceText(
-      //     newEditorState,
-      //     buffer.join('') + text[i]
-      //   );
-      //   buffer = [];
-      } else {
-        buffer.push(text[i]);
-      }
-    }
+    let newEditorState = handleLoadText(editorState, text);
 
     if (editorState !== newEditorState) {
       this.handleChange(newEditorState);
@@ -116,11 +121,6 @@ class Sia extends React.Component {
   }
 
   handleBeforeInput(character, editorState) {
-    // Start to handle stuff only when user types space
-    // if (character !== ' ') {
-    //   return "not-handled";
-    // }
-
     const newEditorState = checkCharacterForState(editorState, character);
 
     if (editorState !== newEditorState) {
