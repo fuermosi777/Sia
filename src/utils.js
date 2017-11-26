@@ -123,13 +123,21 @@ export function checkReturnForState(editorState, event) {
       newEditorState = removeCurrentInlineStyles(newEditorState); 
       
       // Remove inline in undoStack
-      let undoStack = newEditorState.getUndoStack();
-      undoStack = undoStack.pop();
-      newEditorState = EditorState.set(newEditorState, { undoStack });
+      newEditorState = resetUndoStack(newEditorState);
     }
   }
 
   return newEditorState;
+}
+
+export function resetUndoStack(editorState, count = 1) {
+  let undoStack = editorState.getUndoStack();
+  let i = 0;
+  while (i < count) {
+    undoStack = undoStack.pop();
+    i++;
+  }
+  return EditorState.set(editorState, { undoStack });
 }
 
 export function changeCurrentBlockType(
@@ -264,6 +272,15 @@ export function findWithRegex(regex, contentBlock, callback) {
     start = matchArr.index;
     callback(start, start + matchArr[0].length);
   }
+}
+
+export function replaceText(editorState, text) {
+  const contentState = Modifier.insertText(
+    editorState.getCurrentContent(),
+    editorState.getSelection(),
+    text
+  );
+  return EditorState.push(editorState, contentState, 'insert-characters');
 }
 
 export const styleMap = {

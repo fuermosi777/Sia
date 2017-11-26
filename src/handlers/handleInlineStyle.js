@@ -15,6 +15,7 @@ export default function handleInlineStyle(editorState, character) {
       let matchArr;
       do {
         matchArr = re.exec(line);
+        console.log(line)
         if (matchArr) {
           newEditorState = changeCurrentInlineStyle(
             newEditorState,

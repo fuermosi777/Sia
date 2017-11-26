@@ -12,9 +12,12 @@ import {
   checkCharacterForState,
   checkReturnForState,
   getCurrent,
+  replaceText,
   styleMap
 } from './utils';
 import handleInsertText from './handlers/handleInsertText';
+import handleInsertEmptyBlock from './handlers/handleInsertEmptyBlock';
+
 import createImageDecorator from './decorators/imageDecorator';
 import createLinkDecorator from './decorators/linkDecorator';
 
@@ -75,40 +78,41 @@ class Sia extends React.Component {
   handlePastedText(text, html, editorState) {
     let newEditorState = editorState;
     let buffer = [];
-    
+
     for (let i = 0; i < text.length; i++) {
-      if (INLINE_STYLE_CHARACTERS.indexOf(text[i]) >= 0) {
+      if ([' ', '*', '_', '`'].indexOf(text[i]) >= 0) {
         newEditorState = replaceText(
           newEditorState,
-          buffer.join("") + text[i]
+          buffer.join('') + text[i]
         );
-        newEditorState = checkCharacterForState(newEditorState, text[i]);
+        newEditorState = checkCharacterForState(newEditorState, '');
         buffer = [];
       } else if (text[i].charCodeAt(0) === 10) {
-        newEditorState = replaceText(newEditorState, buffer.join(""));
+        // return
+        newEditorState = replaceText(newEditorState, buffer.join(''));
         const tmpEditorState = checkReturnForState(newEditorState, {});
         if (newEditorState === tmpEditorState) {
-          newEditorState = insertEmptyBlock(tmpEditorState);
+          newEditorState = handleInsertEmptyBlock(tmpEditorState);
         } else {
           newEditorState = tmpEditorState;
         }
         buffer = [];
-      } else if (i === text.length - 1) {
-        newEditorState = replaceText(
-          newEditorState,
-          buffer.join("") + text[i]
-        );
-        buffer = [];
+      // } else if (i === text.length - 1) {
+      //   newEditorState = replaceText(
+      //     newEditorState,
+      //     buffer.join('') + text[i]
+      //   );
+      //   buffer = [];
       } else {
         buffer.push(text[i]);
       }
     }
 
     if (editorState !== newEditorState) {
-      setEditorState(newEditorState);
-      return "handled";
+      this.handleChange(newEditorState);
+      return 'handled';
     }
-    return "not-handled";
+    return 'not-handled';
   }
 
   handleBeforeInput(character, editorState) {

@@ -10,5 +10,5 @@ export default function handleInsertText(editorState, text) {
     text,
     editorState.getCurrentInlineStyle()
   );
-  return EditorState.push(editorState, newContentState, "insert-fragment");
+  return EditorState.push(editorState, newContentState, 'insert-fragment');
 };
