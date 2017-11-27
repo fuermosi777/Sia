@@ -30,3 +30,7 @@ Should use decorator
 - Table
 
 Entity + decorator 
+
+# TODO
+
+GFM mode: 123_123_123 vs 123 _123_ 123
