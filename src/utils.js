@@ -68,6 +68,14 @@ function isCodeBlock(type) {
   return type === 'code-block';
 }
 
+function isBlockquote(type) {
+  return type === 'blockquote';
+}
+
+function inUnstyled(type) {
+  return type === 'unstyled';
+}
+
 export function hasInlineStyle(editorState) {
   return editorState.getCurrentInlineStyle().size > 0;
 }
@@ -91,7 +99,7 @@ export function checkReturnForState(editorState, event) {
 
   // For ```, start a new code block
   if (newEditorState === editorState &&
-    !isCodeBlock(type) &&
+    inUnstyled(type) &&
     CODE_BLOCK_START.test(text)
   ) {
     newEditorState = handleNewCodeBlock(editorState);

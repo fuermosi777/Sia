@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom';
 import Sia from '../src';
 
 const text =
-`
-# 123123
+`# 123123
 
 _123123_
 
@@ -14,8 +13,7 @@ _123123_
 
 \`\`\`
 var let t = 3;
-\`\`\`
-`;
+\`\`\``;
 
 class App extends React.Component {
   constructor(props) {
