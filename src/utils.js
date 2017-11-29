@@ -93,7 +93,7 @@ export function checkReturnForState(editorState, event) {
 
   // For headers or blockquote, start a new line
   // No matter if it's last or not
-  if (isHeader(type)) {
+  if (isHeader(type) || isBlockquote(type)) {
     newEditorState = handleInsertEmptyBlock(newEditorState);
   }
 

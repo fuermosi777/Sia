@@ -111,7 +111,7 @@ class Sia extends React.Component {
   }
 
   handlePastedText(text, html, editorState) {
-    let newEditorState = handleLoadText(editorState, text);
+    let newEditorState = handleLoadText(editorState, text, false);
 
     if (editorState !== newEditorState) {
       this.handleChange(newEditorState);

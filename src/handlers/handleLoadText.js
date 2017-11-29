@@ -7,7 +7,9 @@ import {
 import handleInsertEmptyBlock from './handleInsertEmptyBlock';
 import handleInsertText from './handleInsertText';
 
-export default function handleLoadText(editorState, text) {
+const SENSITIVE_CHARS = [' ', '*', '_', '`'];
+
+export default function handleLoadText(editorState, text, isLoadFromStart = true) {
   let newText = text;
 
   // Add a line break manually for text ending with "`"
@@ -22,7 +24,7 @@ export default function handleLoadText(editorState, text) {
   for (let i = 0; i < newText.length; i++) {
     let char = newText[i];
     
-    if (['*', '_', '`'].indexOf(char) >= 0) {
+    if (SENSITIVE_CHARS.indexOf(char) >= 0) {
       newEditorState = replaceText(
         newEditorState,
         buffer.join('') + char
@@ -48,6 +50,12 @@ export default function handleLoadText(editorState, text) {
   }
 
   const endUndoStackSize = newEditorState.getUndoStack().size;
-  newEditorState = forgetUndo(newEditorState, endUndoStackSize - startUndoStackSize);
+
+  let times = endUndoStackSize - startUndoStackSize;
+
+  if (!isLoadFromStart) { // paste
+    times -= 1;
+  }
+  newEditorState = forgetUndo(newEditorState, times);
   return newEditorState;
 }

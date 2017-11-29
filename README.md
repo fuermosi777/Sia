@@ -1,3 +1,7 @@
+# Sia
+
+A react component of WYSIWYG editor for Markdown syntax based on [Draft.js](https://draftjs.org/).
+
 ## Block level styling
 
 - Header 1 ~ 6
