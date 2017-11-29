@@ -1,6 +1,6 @@
 {
   "name": "sia",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -24,14 +24,14 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "draft-js": "^0.10.4",
-    "immutable": "^3.8.2",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"
   },
   "dependencies": {
-    "prop-types": "^15.6.0"
+    "draft-js": "^0.10.4",
+    "prop-types": "^15.6.0",
+    "immutable": "^3.8.2",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1"
   }
 }
