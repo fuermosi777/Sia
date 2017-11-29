@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack-dev-server --env=dev --config webpack.dev.js --progress --profile --colors --hot",
-    "dist": "./node_modules/.bin/babel src/Sia.jsx --out-file dist/index.js --presets=env,react,stage-0 --plugins=syntax-object-rest-spread"
+    "dev": "webpack-dev-server --env=dev --config webpack.dev.js --progress --profile --colors --hot"
   },
   "author": "Hao Liu <liuhao1990@gmail.com>",
   "keywords": [
@@ -17,7 +16,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-plugin-syntax-object-rest-spread": "^6.13.0",
