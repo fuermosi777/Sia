@@ -29,13 +29,15 @@ class Sia extends React.Component {
 
   static propTypes = {
     raw: PropTypes.object,
-    text: PropTypes.string,
+    text: PropTypes.string
   };
 
   static defaultPropTypes = {
     raw: null,
     text: ''
   };
+
+  editor = null;
 
   constructor(props) {
     super(props);
@@ -66,6 +68,8 @@ class Sia extends React.Component {
       if (newEditorState !== this.state.editorState) {
         this.handleChange.call(this, newEditorState);
       }
+    } else {
+      this.focus();
     }
   }
 
@@ -101,7 +105,6 @@ class Sia extends React.Component {
     ev.preventDefault();
   }
   handleKeyCommand(command, editorState) {
-    console.log('key', command);
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.handleChange(newState);
@@ -125,29 +128,28 @@ class Sia extends React.Component {
 
     if (editorState !== newEditorState) {
       this.setState({editorState: newEditorState});
-      return "handled";
+      return 'handled';
     }
 
-    return "not-handled";
+    return 'not-handled';
   }
 
   handleReturn(e, editorState) {
     let newEditorState = checkReturnForState(editorState, e);
     if (editorState !== newEditorState) {
       this.setState({editorState: newEditorState});
-      return "handled";
+      return 'handled';
     }
 
-    return "not-handled";
+    return 'not-handled';
   }
 
-  handleFocus() {
-    // console.log('focus')
-  }
+  handleFocus() {}
 
-  blockRendererFn(contentBlock) {
-    // console.log(contentBlock.getType())
+  blockRendererFn(contentBlock) {}
 
+  focus = () => {
+    this.editor.focus();
   }
 }
 

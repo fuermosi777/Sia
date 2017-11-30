@@ -19,8 +19,11 @@ class App extends React.Component {
   constructor(props) {
     super(props);
   }
+
   render() {
-    return <Sia text={text}/>;
+    return (
+      <Sia text={text}/>
+    );
   }
 }
 
