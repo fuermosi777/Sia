@@ -28,13 +28,15 @@ import createLinkDecorator from './decorators/linkDecorator';
 class Sia extends React.Component {
 
   static propTypes = {
-    raw: PropTypes.object,
-    text: PropTypes.string
+    raw: PropTypes.object, // Draft raw object
+    text: PropTypes.string, // Markdown text
+    isAutoReload: PropTypes.bool, // If text is updated, should we reload the editor?
   };
 
   static defaultPropTypes = {
     raw: null,
-    text: ''
+    text: '',
+    isAutoReload: false
   };
 
   editor = null;
@@ -61,18 +63,27 @@ class Sia extends React.Component {
     this.state = {editorState};
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.text !== this.props.text && this.props.isAutoReload) {
+      let newEditorState = handleLoadText(this.state.editorState, nextProps.text);
+
+      if (newEditorState !== this.state.editorState) {
+        this.handleChange(newEditorState);
+      }
+    }
+  }
+
   componentDidMount() {
     if (this.props.text) {
       let newEditorState = handleLoadText(this.state.editorState, this.props.text);
 
       if (newEditorState !== this.state.editorState) {
-        this.handleChange.call(this, newEditorState);
+        this.handleChange(newEditorState);
       }
     } else {
       this.focus();
     }
   }
-
 
   render() {
     return (
@@ -80,31 +91,31 @@ class Sia extends React.Component {
         <Editor
           ref={editor => this.editor = editor}
           editorState={this.state.editorState}
-          onChange={this.handleChange.bind(this)}
-          blockRendererFn={this.blockRendererFn.bind(this)}
-          handleKeyCommand={this.handleKeyCommand.bind(this)}
-          handleBeforeInput={this.handleBeforeInput.bind(this)}
-          onFocus={this.handleFocus.bind(this)}
-          handleReturn={this.handleReturn.bind(this)}
+          onChange={this.handleChange}
+          blockRendererFn={this.blockRendererFn}
+          handleKeyCommand={this.handleKeyCommand}
+          handleBeforeInput={this.handleBeforeInput}
+          onFocus={this.handleFocus}
+          handleReturn={this.handleReturn}
           customStyleMap={styleMap}
-          onTab={this.handleTab.bind(this)}
+          onTab={this.handleTab}
           stripPastedStyles={true}
-          handlePastedText={this.handlePastedText.bind(this)}
+          handlePastedText={this.handlePastedText}
         />
       </div>
     );
   }
-  handleChange(editorState) {
+  handleChange = editorState => {
     const { content } = getCurrent(editorState);
     
     this.setState({editorState});
   }
-  handleTab(ev) {
+  handleTab = ev => {
     const newEditorState = handleInsertText(this.state.editorState, '\t')
     this.handleChange(newEditorState);
     ev.preventDefault();
   }
-  handleKeyCommand(command, editorState) {
+  handleKeyCommand = (command, editorState) => {
     const newState = RichUtils.handleKeyCommand(editorState, command);
     if (newState) {
       this.handleChange(newState);
@@ -113,7 +124,7 @@ class Sia extends React.Component {
     return 'not-handled';
   }
 
-  handlePastedText(text, html, editorState) {
+  handlePastedText = (text, html, editorState) => {
     let newEditorState = handleLoadText(editorState, text, false);
 
     if (editorState !== newEditorState) {
@@ -123,7 +134,7 @@ class Sia extends React.Component {
     return 'not-handled';
   }
 
-  handleBeforeInput(character, editorState) {
+  handleBeforeInput = (character, editorState) => {
     const newEditorState = checkCharacterForState(editorState, character);
 
     if (editorState !== newEditorState) {
@@ -134,7 +145,7 @@ class Sia extends React.Component {
     return 'not-handled';
   }
 
-  handleReturn(e, editorState) {
+  handleReturn = (e, editorState) => {
     let newEditorState = checkReturnForState(editorState, e);
     if (editorState !== newEditorState) {
       this.setState({editorState: newEditorState});
@@ -144,9 +155,9 @@ class Sia extends React.Component {
     return 'not-handled';
   }
 
-  handleFocus() {}
+  handleFocus = () => {}
 
-  blockRendererFn(contentBlock) {}
+  blockRendererFn = (contentBlock) => {}
 
   focus = () => {
     this.editor.focus();
