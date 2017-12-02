@@ -5,16 +5,9 @@ class Link extends React.Component {
     super(props);
   }
 
-  handleFocus() {
-    console.log(1);
-    
-  }
-
   render() {
-    let { href, title } = this.props;
-
     return (
-      <a href={href} title={title} onFocus={this.handleFocus.bind(this)}>
+      <a href={this.props.href} title={this.props.title}>
         {this.props.children}
       </a>
     );
@@ -27,5 +20,9 @@ export default function linkComponent(props) {
     .getEntity(props.entityKey)
     .getData();
 
-  return <Link {...props}/>;
+  return (
+    <Link href={href} title={title}>
+      {props.children}
+    </Link>
+  );
 };

@@ -25,7 +25,7 @@ import handleLoadText from './handlers/handleLoadText';
 import createImageDecorator from './decorators/imageDecorator';
 import createLinkDecorator from './decorators/linkDecorator';
 
-class Sia extends React.Component {
+class Sia extends React.PureComponent {
 
   static propTypes = {
     raw: PropTypes.object, // Draft raw object
@@ -108,8 +108,10 @@ class Sia extends React.Component {
     );
   }
   handleChange = editorState => {
-    const { content } = getCurrent(editorState);
-    
+    let { block, selection } = getCurrent(editorState);
+    console.log(selection.getAnchorOffset(), selection.getFocusOffset())
+
+
     this.setState({editorState});
   }
   handleTab = ev => {
@@ -157,7 +159,8 @@ class Sia extends React.Component {
     return 'not-handled';
   }
 
-  handleFocus = () => {}
+  handleFocus = () => {
+  }
 
   focus = () => {
     this.editor.focus();

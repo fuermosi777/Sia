@@ -1,12 +1,22 @@
 import React from 'react';
 
-export default function Image({ entityKey, children, contentState }) {
-  const { src, alt, title } = contentState.getEntity(entityKey).getData();
+class Image extends React.Component {
+  handleClick = () => {
+    console.log(1);
+    
+  }
+  render() {
+    return (
+      <a onClick={this.handleClick}>
+        {this.props.children}
+        <img src={this.props.src} alt={this.props.alt} title={this.props.title} />
+      </a>
+    );
+  }
+}
 
-  return (
-    <span>
-      {children}
-      <img src={src} alt={alt} title={title} />
-    </span>
-  );
+export default function imageComponent(props) {
+  const { src, alt, title } = props.contentState.getEntity(props.entityKey).getData();
+
+  return <Image src={src} alt={alt} title={title}>{props.children}</Image>;
 }
