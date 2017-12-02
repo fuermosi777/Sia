@@ -38,3 +38,21 @@ Entity + decorator
 # TODO
 
 GFM mode: 123_123_123 vs 123 _123_ 123
+
+escape \*\*
+
+add __ __ in text will remove the later space
+
+blockquote add return before should insert \n?
+
+blockquote return should just insert \n
+
+hr
+
+indention on list
+
+copy and paste html
+
+image
+
+link

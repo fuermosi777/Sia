@@ -8,14 +8,14 @@ import {
   SelectionState,
   ContentState,
   convertToRaw,
-  convertFromRaw,
+  convertFromRaw
 } from 'draft-js';
 import { 
   checkCharacterForState,
   checkReturnForState,
   getCurrent,
   replaceText,
-  styleMap
+  blockStyleFn
 } from './utils';
 import PropTypes from 'prop-types';
 import handleInsertText from './handlers/handleInsertText';
@@ -31,12 +31,14 @@ class Sia extends React.Component {
     raw: PropTypes.object, // Draft raw object
     text: PropTypes.string, // Markdown text
     isAutoReload: PropTypes.bool, // If text is updated, should we reload the editor?
+    styleMap: PropTypes.object
   };
 
   static defaultPropTypes = {
     raw: null,
     text: '',
-    isAutoReload: false
+    isAutoReload: false,
+    styleMap: {}
   };
 
   editor = null;
@@ -92,12 +94,12 @@ class Sia extends React.Component {
           ref={editor => this.editor = editor}
           editorState={this.state.editorState}
           onChange={this.handleChange}
-          blockRendererFn={this.blockRendererFn}
+          blockStyleFn={blockStyleFn}
           handleKeyCommand={this.handleKeyCommand}
           handleBeforeInput={this.handleBeforeInput}
           onFocus={this.handleFocus}
           handleReturn={this.handleReturn}
-          customStyleMap={styleMap}
+          customStyleMap={this.props.styleMap}
           onTab={this.handleTab}
           stripPastedStyles={true}
           handlePastedText={this.handlePastedText}
@@ -156,8 +158,6 @@ class Sia extends React.Component {
   }
 
   handleFocus = () => {}
-
-  blockRendererFn = (contentBlock) => {}
 
   focus = () => {
     this.editor.focus();

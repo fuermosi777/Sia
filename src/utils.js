@@ -300,11 +300,12 @@ export function replaceText(editorState, text) {
   return EditorState.push(editorState, contentState, 'insert-characters');
 }
 
-export const styleMap = {
-  HEADER_MARKER: {
-    color: 'lightgray'
-  },
-  INLINE_MARKER: {
-    color: 'red'
+export function blockStyleFn(contentBlock) {
+  const type = contentBlock.getType();
+  
+  if (type === 'unstyled') {
+    return 'normal';
+  } else if (isCodeBlock(type)) {
+    return type;
   }
-};
+}
