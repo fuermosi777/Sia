@@ -55,4 +55,4 @@ copy and paste html
 
 image
 
-link
+link - replace link in middle text will lose after

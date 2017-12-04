@@ -31,7 +31,8 @@ class Sia extends React.PureComponent {
     raw: PropTypes.object, // Draft raw object
     text: PropTypes.string, // Markdown text
     isAutoReload: PropTypes.bool, // If text is updated, should we reload the editor?
-    styleMap: PropTypes.object
+    styleMap: PropTypes.object,
+    onImageEditing: PropTypes.func
   };
 
   static defaultPropTypes = {
@@ -47,7 +48,7 @@ class Sia extends React.PureComponent {
     super(props);
 
     const compositeDecorator = new CompositeDecorator([
-      createImageDecorator(),
+      createImageDecorator(this.onImageEntityEditing),
       createLinkDecorator()
     ]);
 
@@ -108,10 +109,6 @@ class Sia extends React.PureComponent {
     );
   }
   handleChange = editorState => {
-    let { block, selection } = getCurrent(editorState);
-    console.log(selection.getAnchorOffset(), selection.getFocusOffset())
-
-
     this.setState({editorState});
   }
   handleTab = ev => {
@@ -164,6 +161,12 @@ class Sia extends React.PureComponent {
 
   focus = () => {
     this.editor.focus();
+  }
+
+  onImageEntityEditing = () => {
+    if (this.props.onImageEditing) {
+      this.props.onImageEditing(this.state.editorState);
+    }
   }
 }
 

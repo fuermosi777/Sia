@@ -1,16 +1,27 @@
 import React from 'react';
 
-class Image extends React.Component {
+class Image extends React.PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      src: props.src,
+      alt: props.alt,
+      title: props.title
+    }
+  }
   handleClick = () => {
-    console.log(1);
-    
+    this.props.onEditing();
   }
   render() {
     return (
-      <a onClick={this.handleClick}>
+      <span onClick={this.handleClick}>
         {this.props.children}
-        <img src={this.props.src} alt={this.props.alt} title={this.props.title} />
-      </a>
+        <img src={this.state.src} alt={this.state.alt} title={this.state.title} />
+        <div>
+          ![{this.state.alt}]({this.state.src})
+        </div>
+      </span>
     );
   }
 }
@@ -18,5 +29,5 @@ class Image extends React.Component {
 export default function imageComponent(props) {
   const { src, alt, title } = props.contentState.getEntity(props.entityKey).getData();
 
-  return <Image src={src} alt={alt} title={title}>{props.children}</Image>;
+  return <Image src={src} alt={alt} title={title} onEditing={props.onEditing}>{props.children}</Image>;
 }

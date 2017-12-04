@@ -1,9 +1,12 @@
 import imageStrategy from './imageStrategy';
 import imageComponent from './imageComponent';
 
-export default function createImageDecorator() {
+export default function createImageDecorator(onEditing) {
   return {
     strategy: imageStrategy,
-    component: imageComponent
+    component: imageComponent,
+    props: {
+      onEditing
+    }
   }
 };

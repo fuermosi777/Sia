@@ -12,7 +12,7 @@ function insertImage(editorState, matchArr) {
     anchorOffset: index,
     focusOffset,
   });
-  const nextContent = content.createEntity('IMG', 'MUTABLE', {
+  const nextContent = content.createEntity('IMG', 'IMMUTABLE', {
     alt,
     src,
     title,

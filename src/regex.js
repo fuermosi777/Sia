@@ -16,4 +16,4 @@ export const ITALIC = [
 export const CODE = [/(`([^`]+)`)/g];
 export const STRIKETHROUGH = [/(~~([^(?:~~)]+)~~)/g];
 export const IMAGE = /!\[([^\]]*)]\(([^)"]+)(?: "([^"]+)")?\)/g;
-export const LINK = /!\[([^\]\[]*)]\(([^)"]+)(?: "([^"]+)")?\)/g;
+export const LINK = /\[([^\]]+)]\(([^)"]+)(?: "([^"]+)")?\)/g;
