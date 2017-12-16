@@ -163,6 +163,15 @@ class Sia extends React.PureComponent {
     this.editor.focus();
   }
 
+  /**
+   * Return markdown text of current state
+   * @return {string}
+   */
+  getText = () => {
+    let { content } = getCurrent(this.state.editorState);
+    console.log(convertToRaw(content));
+  }
+
   onImageEntityEditing = () => {
     if (this.props.onImageEditing) {
       this.props.onImageEditing(this.state.editorState);

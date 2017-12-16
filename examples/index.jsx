@@ -20,10 +20,19 @@ class App extends React.Component {
     super(props);
   }
 
+  editor = null;
+
   render() {
     return (
-      <Sia text={text}/>
+      <div>
+        <button onClick={this.handleExportClick}>Export markdown text</button>
+        <Sia text={text} ref={editor => this.editor = editor}/>
+      </div>
     );
+  }
+
+  handleExportClick = () => {
+    this.editor.getText();
   }
 }
 
