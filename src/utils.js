@@ -110,12 +110,21 @@ export function checkReturnForState(editorState, event) {
     isCodeBlock(type)
   ) {
     if (CODE_BLOCK_END.test(text)) {
-      // remove last ```
-      newEditorState = changeCurrentBlockType(
-        newEditorState,
-        type,
-        text.replace(/\n```\s*$/, '')
-      );
+      // remove last ``` with \n, or just ```
+      // TODO: make it one regex
+      if (/^```\s*$/.test(text)) {
+        newEditorState = changeCurrentBlockType(
+          newEditorState,
+          type,
+          text.replace(/^```\s*$/, '')
+        );
+      } else {
+        newEditorState = changeCurrentBlockType(
+          newEditorState,
+          type,
+          text.replace(/\n```\s*$/, '')
+        );
+      }
       // start a new line
       newEditorState = handleInsertEmptyBlock(newEditorState);
     } else {
