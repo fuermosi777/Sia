@@ -25,13 +25,27 @@ import handleLoadText from './handlers/handleLoadText';
 import createImageDecorator from './decorators/imageDecorator';
 import createLinkDecorator from './decorators/linkDecorator';
 
+const styleMap = {
+  BOLD_STAR: {
+    fontWeight: 'bold'
+  },
+  BOLD_UNDERSCORE: {
+    fontWeight: 'bold',
+  },
+  ITALIC_STAR: {
+    fontStyle: 'italic'
+  },
+  ITALIC_UNDERSCORE: {
+    fontStyle: 'italic'
+  }
+};
+
 class Sia extends React.PureComponent {
 
   static propTypes = {
     raw: PropTypes.object, // Draft raw object
     text: PropTypes.string, // Markdown text
     isAutoReload: PropTypes.bool, // If text is updated, should we reload the editor?
-    styleMap: PropTypes.object,
     onImageEditing: PropTypes.func
   };
 
@@ -39,7 +53,6 @@ class Sia extends React.PureComponent {
     raw: null,
     text: '',
     isAutoReload: false,
-    styleMap: {}
   };
 
   editor = null;
@@ -100,7 +113,7 @@ class Sia extends React.PureComponent {
           handleBeforeInput={this.handleBeforeInput}
           onFocus={this.handleFocus}
           handleReturn={this.handleReturn}
-          customStyleMap={this.props.styleMap}
+          customStyleMap={styleMap}
           onTab={this.handleTab}
           stripPastedStyles={true}
           handlePastedText={this.handlePastedText}

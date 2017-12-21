@@ -5,11 +5,16 @@ import Sia from '../src';
 const text =
 `# 123123
 
-_123123_
+*123*
 
 **12312321** _123123_
 
 > sdfasdf
+
+*456*
+
+
+
 
 \`\`\`
 var let t = 3;

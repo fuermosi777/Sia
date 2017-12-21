@@ -175,13 +175,13 @@ export function changeCurrentBlockType(
   return EditorState.push(editorState, newContentState, 'change-block-type');
 };
 
-export function changeCurrentInlineStyle(editorState, matchArr, style, character) {
+export function changeCurrentInlineStyle(editorState, matchArr, style, character = '') {
   // Since JS doesn't have zero-width negative lookbehind,
   // need to check match array manually
   // So the matchArr would be 
   // [/* real match */, /* the match I want */, /* should captured group */]
   const isRegexZeroWidth = matchArr[0] === matchArr[1];
-  const index = isRegexZeroWidth ? matchArr.index : matchArr.index + 1;
+  const index = isRegexZeroWidth ? matchArr.index : (matchArr.index + 1);
 
   const currentContent = editorState.getCurrentContent();
   const selection = editorState.getSelection();
@@ -197,7 +197,13 @@ export function changeCurrentInlineStyle(editorState, matchArr, style, character
     newStyle = currentInlineStyle.merge([style]);
   }
 
-  const focusOffset = index + matchArr[1].length;
+  /** @type {number} to replace range end */
+  let focusOffset = index + matchArr[1].length;
+
+  if (character !== '') {
+    focusOffset -= 1;
+  }
+
   const wordSelection = SelectionState.createEmpty(key).merge({
     anchorOffset: index,
     focusOffset,
