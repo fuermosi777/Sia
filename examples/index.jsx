@@ -15,7 +15,8 @@ const text =
 
 \`\`\`
 var let t = 3;
-\`\`\``;
+\`\`\`
+`;
 
 class App extends React.Component {
   constructor(props) {

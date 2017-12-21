@@ -200,6 +200,7 @@ export function changeCurrentInlineStyle(editorState, matchArr, style, character
   /** @type {number} to replace range end */
   let focusOffset = index + matchArr[1].length;
 
+  // Check if char exists, if yes, then it's manually enter, not loadText
   if (character !== '') {
     focusOffset -= 1;
   }
