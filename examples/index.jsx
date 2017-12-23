@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import Sia from '../src';
 
 const text =
-`# 123123
+`# header one
 
 *123*
 
@@ -11,7 +11,7 @@ const text =
 
 > sdfasdf
 
-*456*
+*italic*
 
 \`\`\`
 var let t = 3;

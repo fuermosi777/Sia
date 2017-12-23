@@ -1,5 +1,5 @@
 export const CODE_BLOCK_START = /^```([\w-]+)?\s*$/;
-export const CODE_BLOCK_END = /```\s*$/;
+export const CODE_BLOCK_END = /\n```\s*$/;
 export const BOLD_STAR = /(\*\*([^(?:**)]+)\*\*)/g;
 export const BOLD_UNDERSCORE = /(__([^(?:__)]+)__)/g;
 

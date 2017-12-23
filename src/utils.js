@@ -103,6 +103,8 @@ export function checkReturnForState(editorState, event) {
     CODE_BLOCK_START.test(text)
   ) {
     newEditorState = handleNewCodeBlock(editorState);
+
+    return newEditorState; // why early return? to avoid line 127 shit
   }
 
   // For ```, end code block
@@ -110,21 +112,11 @@ export function checkReturnForState(editorState, event) {
     isCodeBlock(type)
   ) {
     if (CODE_BLOCK_END.test(text)) {
-      // remove last ``` with \n, or just ```
-      // TODO: make it one regex
-      if (/^```\s*$/.test(text)) {
-        newEditorState = changeCurrentBlockType(
-          newEditorState,
-          type,
-          text.replace(/^```\s*$/, '')
-        );
-      } else {
-        newEditorState = changeCurrentBlockType(
-          newEditorState,
-          type,
-          text.replace(/\n```\s*$/, '')
-        );
-      }
+      newEditorState = changeCurrentBlockType(
+        newEditorState,
+        type,
+        text.replace(/\n```\s*$/, '')
+      );
       // start a new line
       newEditorState = handleInsertEmptyBlock(newEditorState);
     } else {
@@ -133,11 +125,11 @@ export function checkReturnForState(editorState, event) {
   }
 
   if (type === 'unstyled' && hasInlineStyle(newEditorState)) {
-      newEditorState = handleSplitBlock(newEditorState);
-      newEditorState = removeCurrentInlineStyles(newEditorState);
-      
-      // Remove inline in undoStack
-      newEditorState = forgetUndo(newEditorState);
+    newEditorState = handleSplitBlock(newEditorState);
+    newEditorState = removeCurrentInlineStyles(newEditorState);
+    
+    // Remove inline in undoStack
+    newEditorState = forgetUndo(newEditorState);
   }
 
   return newEditorState;
@@ -163,7 +155,7 @@ export function forgetUndo(editorState, times = 1, keepEarliest = false) {
 export function changeCurrentBlockType(
   editorState,
   type,
-  text,
+  text = '',
   blockMetadata = {}
 ) {
   const currentContent = editorState.getCurrentContent();
@@ -172,7 +164,7 @@ export function changeCurrentBlockType(
   const blockMap = currentContent.getBlockMap();
   const block = blockMap.get(key);
   const data = block.getData().merge(blockMetadata);
-  const newBlock = block.merge({ type, data, text: text || '' });
+  const newBlock = block.merge({ type, data, text});
   const newSelection = selection.merge({
     anchorOffset: 0,
     focusOffset: 0,
@@ -234,12 +226,13 @@ export function changeCurrentInlineStyle(editorState, matchArr, style, character
     'change-inline-style'
   );
   
+  // move cursor to the end
   newEditorState = EditorState.forceSelection(
     newEditorState,
     newContentState.getSelectionAfter()
   );
 
-  // Remove styles
+  // Remove styles so that what enters next will not have any styles
   return EditorState.setInlineStyleOverride(
     newEditorState,
     new OrderedSet()
@@ -250,7 +243,7 @@ export function removeCurrentInlineStyles(editorState) {
   let { text, content, selection, key } = getCurrent(editorState);
 
   let newContentState = content;
-  let styles = ['BOLD', 'ITALIC', 'CODE', 'UNDERLINE', 'STRIKETHROUGH'];
+  let styles = ['BOLD_STAR', 'BOLD_UNDERSCORE', 'ITALIC_STAR', 'ITALIC_UNDERSCORE', 'CODE', 'UNDERLINE', 'STRIKETHROUGH'];
 
   const entireBlockSelection = selection.merge({
     anchorKey: key,

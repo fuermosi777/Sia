@@ -161,6 +161,8 @@ class Sia extends React.PureComponent {
 
   handleReturn = (e, editorState) => {
     let newEditorState = checkReturnForState(editorState, e);
+    // let { content } = getCurrent(newEditorState);
+    // console.log(convertToRaw(content));
     if (editorState !== newEditorState) {
       this.setState({editorState: newEditorState});
       return 'handled';
